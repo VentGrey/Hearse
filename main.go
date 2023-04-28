@@ -96,3 +96,35 @@ func Parse(code string) *AST {
 
 	return ast
 }
+
+func Interpret(ast *AST) {
+	tape := make([]byte, 30000)
+	ptr := 0
+
+	for _, inst := range ast.Instructions {
+		switch inst.Op {
+		case INCREMENT_POINTER:
+			ptr++
+		case DECREMENT_POINTER:
+			ptr--
+		case INCREMENT_VALUE:
+			tape[ptr]++
+		case DECREMENT_VALUE:
+			tape[ptr]--
+		case OUTPUT_VALUE:
+			fmt.Printf(string(tape[ptr]))
+		case INPUT_VALUE:
+			var input byte
+			fmt.Scan(&input)
+			tape[ptr] = input
+		case JUMP_FORWARD:
+			if tape[ptr] == 0 {
+				inst = inst.Offset
+			}
+		case JUMP_BACKWARD:
+			if tape[ptr] != 0 {
+				inst = inst.Offset
+			}
+		}
+	}
+}
